@@ -1,0 +1,544 @@
+\documentclass[12pt]{article}
+
+% ─── Packages ──────────────────────────────────────────────────────────────────
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb, amsthm}
+% \usepackage{physics}  % not available; using manual macros
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{parskip}          % paragraph spacing instead of indent
+% \usepackage{microtype}  % disabled for compatibility
+\usepackage[font=small,labelfont=bf]{caption}
+
+% ─── Theorem-like environments ─────────────────────────────────────────────────
+\theoremstyle{definition}
+\newtheorem{assumption}{Assumption}
+\newtheorem{definition}{Definition}
+\newtheorem{result}{Result}
+
+% ─── Convenience macros ────────────────────────────────────────────────────────
+\newcommand{\Teff}{T_{\!\text{eff}}}
+\newcommand{\Eacc}[1]{E_{#1}}
+\newcommand{\Prob}[1]{P\!\left(#1\right)}
+
+% ─── Document metadata ─────────────────────────────────────────────────────────
+\title{\textbf{Derivation of Expected Accidental Coincidence Rates}\\[6pt]
+       \large Muon Shower Detector Array --- Technical Note}
+\author{Muon Technical Report v2, \S6 (Expanded Derivation)}
+\date{March 2026}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+% ───────────────────────────────────────────────────────────────────────────────
+\section{Overview and Physical Motivation}
+% ───────────────────────────────────────────────────────────────────────────────
+
+An \textit{accidental coincidence} is a near-simultaneous signal in
+multiple detectors that arises purely from independent, uncorrelated
+background events rather than from a genuine cosmic-ray air shower.
+Quantifying the expected rate of accidentals is essential: any
+statistically significant \emph{excess} of observed coincidences above
+this background is evidence for real shower events.
+
+The detector array consists of $N = 8$ scintillator panels (\emph{Nano
+detectors}), each generating a time-stamped pulse whenever a charged
+particle passes through.  After hardware calibration and a synchronisation
+veto to remove periodic artefacts, each detector independently fires at a
+roughly constant mean rate.  We ask:
+
+\begin{quote}
+\itshape
+Given independent Poisson processes, how many times do we expect $k$
+specified detectors all to fire within a time window of half-width $\tau$
+purely by chance, over an effective run of duration $\Teff$?
+\end{quote}
+
+The derivation proceeds in three stages:
+\begin{enumerate}
+    \item Establish the Poisson framework and define the coincidence window.
+    \item Derive the two-fold ($k=2$) accidental rate exactly.
+    \item Generalise to an arbitrary $k$-fold coincidence and sum over
+          all detector subsets.
+\end{enumerate}
+
+% ───────────────────────────────────────────────────────────────────────────────
+\section{Definitions and Assumptions}
+% ───────────────────────────────────────────────────────────────────────────────
+
+\begin{definition}[Detector rates and run duration]
+Let detector $i$ ($i = 1, \ldots, N$, $N=8$) fire according to an
+independent, stationary Poisson process with measured rate
+$r_i$~(events\,s$^{-1}$).  The effective run duration after dead-time
+and veto corrections is $\Teff$~(s).
+\end{definition}
+
+\begin{definition}[Coincidence window]
+A \emph{coincidence window} of half-width $\tau$ is the symmetric
+interval $[t-\tau,\, t+\tau]$ of total width $2\tau$ centred on a
+reference time $t$.  Two events are coincident if they fall within the
+same window.
+\end{definition}
+
+\begin{assumption}[Stationarity]\label{ass:stat}
+Each $r_i$ is constant over the run.  This is verified after calibration
+and the sync veto.
+\end{assumption}
+
+\begin{assumption}[Independence between detectors]\label{ass:indep}
+The firing of detector $j$ is statistically independent of the firing of
+detector $i \neq j$.  A significant excess of observed coincidences over
+the accidental prediction derived below is therefore evidence of
+\emph{correlated} events (genuine showers).
+\end{assumption}
+
+\begin{assumption}[Rare-event / thin-window approximation]\label{ass:rare}
+For the window widths and rates of interest,
+\begin{equation}
+    r_i \cdot 2\tau \;\ll\; 1.
+    \label{eq:rare}
+\end{equation}
+Concretely, at $r \approx 1$~Hz and $\tau = 0.5$~ms this factor is
+$r \cdot 2\tau = 10^{-3}$, accurate to $0.1\,\%$.  Under this condition
+the probability of \emph{two or more} events from the same detector
+falling inside a single window is $\mathcal{O}\!\left[(r\tau)^2\right]$
+and is negligible.
+\end{assumption}
+
+% ───────────────────────────────────────────────────────────────────────────────
+\section{Poisson Background: Key Probability Results}
+% ───────────────────────────────────────────────────────────────────────────────
+
+Before deriving the coincidence rates we collect the Poisson results
+that underpin the calculation.
+
+\subsection{Number of events in a fixed interval}
+
+A Poisson process with rate $r$ generates a number of events $X$ in a
+time interval of length $\Delta t$ distributed as
+\begin{equation}
+    \Prob{X = n} = \frac{(r\,\Delta t)^n\, e^{-r\,\Delta t}}{n!},
+    \qquad n = 0, 1, 2, \ldots
+    \label{eq:poisson-pmf}
+\end{equation}
+with mean $\langle X \rangle = r\,\Delta t$ and variance $\operatorname{Var}(X)
+= r\,\Delta t$.
+
+\subsection{Probability of at least one event}
+
+The probability that at least one event falls in $\Delta t$ is
+\begin{equation}
+    \Prob{X \geq 1} = 1 - \Prob{X = 0} = 1 - e^{-r\,\Delta t}.
+    \label{eq:at-least-one-exact}
+\end{equation}
+Under the rare-event approximation \eqref{eq:rare} (i.e.\ $r\,\Delta t \ll 1$),
+the Taylor expansion of \eqref{eq:at-least-one-exact} gives
+\begin{align}
+    \Prob{X \geq 1}
+        &= 1 - e^{-r\,\Delta t} \notag \\
+        &= 1 - \Bigl[1 - r\,\Delta t + \tfrac{(r\,\Delta t)^2}{2} -
+           \cdots\Bigr] \notag \\
+        &= r\,\Delta t - \tfrac{(r\,\Delta t)^2}{2} + \cdots \notag \\
+        &\approx r\,\Delta t.
+    \label{eq:at-least-one-approx}
+\end{align}
+The discarded terms are $\mathcal{O}\!\left[(r\,\Delta t)^2\right]$, which
+by Assumption~\ref{ass:rare} are $\lesssim 10^{-6}$ for $r \sim 1$~Hz
+and $\tau \leq 10$~ms.
+
+\textbf{Physical interpretation.} In the rare-event regime the window
+is so narrow that the probability of getting \emph{any} hit from a
+single detector equals simply the mean number of hits expected in the
+window.  One can think of $r_j \cdot 2\tau$ as the fractional ``dead
+fraction'' of the run that detector $j$'s activity fills.
+
+% ───────────────────────────────────────────────────────────────────────────────
+\section{Two-Fold Accidental Coincidence Rate}
+\label{sec:two-fold}
+% ───────────────────────────────────────────────────────────────────────────────
+
+\subsection{Setup: trigger-and-follower framework}
+
+Consider a specific ordered pair of detectors $(i, j)$.  We use a
+\emph{trigger–follower} argument:
+
+\begin{enumerate}
+    \item \textbf{Trigger:} Detector $i$ fires at time $t$.  This
+          defines a coincidence window $W = [t-\tau,\, t+\tau]$ of
+          width $2\tau$.
+    \item \textbf{Follower:} We ask whether detector $j$ (independent
+          of $i$ by Assumption~\ref{ass:indep}) also fires at least
+          once inside $W$.
+\end{enumerate}
+
+The key insight is that, conditioned on $i$ having fired, the subsequent
+behaviour of $j$ inside $W$ is simply a Poisson process with rate $r_j$
+acting over a fixed time interval of length $2\tau$.
+
+\subsection{Probability that the follower fires in the window}
+
+From \eqref{eq:at-least-one-approx}, the probability that detector $j$
+fires at least once in the window $W$ is
+\begin{equation}
+    \Prob{j \text{ fires in } W \mid i \text{ triggered}}
+    = 1 - e^{-r_j \cdot 2\tau}
+    \;\approx\; r_j \cdot 2\tau,
+    \label{eq:pj-in-window}
+\end{equation}
+where the approximation uses \eqref{eq:at-least-one-approx} and
+Assumption~\ref{ass:rare}.
+
+\subsection{Expected number of accidental two-fold coincidences}
+
+Over the entire run, detector $i$ produces a total of
+\begin{equation}
+    N_i = r_i\,\Teff
+    \label{eq:num-triggers}
+\end{equation}
+trigger events (in expectation).  Each trigger independently opens a
+window, and each window has probability \eqref{eq:pj-in-window} of
+capturing a hit from $j$.  These trials are:
+\begin{itemize}
+    \item \textit{Identical:} the same probability applies to every
+          window (stationarity, Assumption~\ref{ass:stat}).
+    \item \textit{Independent:} non-overlapping triggers are by
+          definition independent; even for closely spaced triggers the
+          independence follows from the memoryless property of Poisson
+          processes.
+\end{itemize}
+Therefore the expected number of accidental coincidences between the
+specific pair $(i, j)$ is
+\begin{align}
+    \Eacc{2,ij}
+        &= \underbrace{r_i\,\Teff}_{\text{no.\ of triggers}}
+           \;\times\;
+           \underbrace{r_j\cdot 2\tau}_{\text{prob.\ follower hits window}}
+           \notag \\[6pt]
+        &= r_i\,r_j\,(2\tau)\,\Teff.
+        \label{eq:E2ij}
+\end{align}
+
+\begin{result}[Two-fold accidental rate, Eq.\ (6.1)]
+\begin{equation}
+    \boxed{
+        \Eacc{2,ij} = r_i\,r_j\,(2\tau)\,\Teff
+    }
+    \tag{6.1}
+\end{equation}
+\end{result}
+
+\subsection{Symmetry check}
+
+Expression \eqref{eq:E2ij} is \emph{symmetric} in $i$ and $j$:
+swapping which detector is the trigger gives
+\[
+    \Eacc{2,ji} = r_j\,r_i\,(2\tau)\,\Teff = \Eacc{2,ij}.
+\]
+This is physically required: the expected number of accidental
+coincidences between a pair of detectors cannot depend on our bookkeeping
+choice of which one we call the ``trigger.''
+
+\subsection{Double-counting note}
+
+When we later sum over all \emph{pairs}, the combination $\{i,j\}$ is
+counted once (as an unordered subset).  We do \textbf{not} add both
+$E_{2,ij}$ and $E_{2,ji}$; the trigger is a mathematical device, not a
+physical distinction.
+
+% ───────────────────────────────────────────────────────────────────────────────
+\section{k-Fold Accidental Coincidence Rate for a Specific Subset}
+\label{sec:kfold-specific}
+% ───────────────────────────────────────────────────────────────────────────────
+
+\subsection{Generalising the trigger-follower argument}
+
+Let $S = \{i_1, i_2, \ldots, i_k\}$ be a specific ordered set of $k$
+detectors.  Designate $i_1$ as the trigger.
+
+\paragraph{Step 1: Trigger events.}
+Detector $i_1$ fires $r_{i_1}\Teff$ times (in expectation) over the run.
+Each firing at time $t$ opens a window $W = [t-\tau, t+\tau]$.
+
+\paragraph{Step 2: Each follower fires independently.}
+For each follower detector $i_m$ ($m = 2, \ldots, k$), the probability
+that it fires at least once inside $W$ is (from \eqref{eq:pj-in-window})
+\begin{equation}
+    \Prob{i_m \text{ fires in } W \mid i_1 \text{ triggered}}
+    \approx r_{i_m}\cdot 2\tau.
+    \label{eq:follower-prob}
+\end{equation}
+
+\paragraph{Step 3: All $k-1$ followers fire simultaneously.}
+By Assumption~\ref{ass:indep} (independence between detectors), the
+events in \eqref{eq:follower-prob} are independent for different $m$.
+The probability that \textit{all} $k-1$ followers fire inside $W$ is
+therefore the product of the individual probabilities:
+\begin{equation}
+    \Prob{\text{all followers fire in }W \mid i_1 \text{ triggered}}
+    = \prod_{m=2}^{k} r_{i_m}\cdot 2\tau
+    = (2\tau)^{k-1}\prod_{m=2}^{k} r_{i_m}.
+    \label{eq:all-followers}
+\end{equation}
+The $(2\tau)^{k-1}$ factor arises because there are $k-1$ followers each
+contributing one power of $2\tau$.
+
+\subsection{Combining trigger count and follower probability}
+
+Multiplying the number of triggers \eqref{eq:num-triggers} by the joint
+follower probability \eqref{eq:all-followers}:
+
+\begin{align}
+    \Eacc{k,S}
+        &= r_{i_1}\Teff
+           \;\times\;
+           (2\tau)^{k-1}\prod_{m=2}^{k} r_{i_m}
+           \notag \\[4pt]
+        &= \Teff\,(2\tau)^{k-1}
+           \;\underbrace{r_{i_1}\prod_{m=2}^{k} r_{i_m}}_{= \prod_{m=1}^{k} r_{i_m}}
+           \notag \\[4pt]
+        &= \Teff\,(2\tau)^{k-1}\prod_{m=1}^{k} r_{i_m}.
+        \label{eq:Ek-specific}
+\end{align}
+
+\begin{result}[$k$-fold accidental rate for a specific $k$-tuple, Eq.\ (6.2)]
+\begin{equation}
+    \boxed{
+        \Eacc{k,S} = \Teff\,(2\tau)^{k-1}\prod_{i \in S} r_i
+    }
+    \tag{6.2}
+\end{equation}
+\end{result}
+
+\subsection{Why the choice of trigger drops out}
+
+The final expression \eqref{eq:Ek-specific} contains the product of
+\emph{all} $k$ rates $r_{i_1}\cdots r_{i_k}$, regardless of which
+detector was labelled the trigger.  The trigger contributed one factor of
+$r_{i_1}$ to the count $N_{i_1} = r_{i_1}\Teff$, while the $k-1$
+followers each contributed one factor of $r_{i_m}\cdot 2\tau$.  The
+product simply collects all $k$ rates symmetrically.  In other words, had
+we chosen $i_2$ as the trigger instead, the derivation would have given
+\[
+    r_{i_2}\Teff \times (2\tau)^{k-1}\prod_{\substack{m=1\\m\neq 2}}^{k} r_{i_m}
+    = \Teff\,(2\tau)^{k-1}\prod_{m=1}^{k} r_{i_m},
+\]
+which is identical.  The result is fully symmetric in all $k$ detectors.
+
+\subsection{Dimensional analysis}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lll}
+\toprule
+Quantity & Units & Exponent in \eqref{eq:Ek-specific} \\
+\midrule
+$\Teff$      & s                    & 1 \\
+$(2\tau)^{k-1}$ & s$^{k-1}$         & $k-1$ \\
+$\prod r_{i_m}$ & (s$^{-1}$)$^k$  & $k$ \\
+\midrule
+Product      & s$^{1+(k-1)-k}$ = s$^0$ = dimensionless & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The result is a dimensionless \emph{count}, as required.
+
+% ───────────────────────────────────────────────────────────────────────────────
+\section{Total Expected k-Fold Accidentals (All Subsets)}
+\label{sec:total-kfold}
+% ───────────────────────────────────────────────────────────────────────────────
+
+\subsection{Summing over all k-element subsets}
+
+The array contains $N = 8$ detectors.  The number of distinct
+$k$-element subsets (unordered combinations) is $\binom{N}{k} = \binom{8}{k}$.
+The total expected number of accidental $k$-fold coincidences is the
+sum of \eqref{eq:Ek-specific} over all such subsets:
+\begin{equation}
+    \Eacc{k}
+    = \sum_{\substack{S\,\subseteq\,\{1,\ldots,8\}\\ |S|=k}}
+        \Teff\,(2\tau)^{k-1}\prod_{i\in S} r_i.
+    \label{eq:Ek-total-pre}
+\end{equation}
+Since $\Teff$ and $(2\tau)^{k-1}$ do not depend on the subset $S$, they
+factor out of the sum:
+\begin{equation}
+    \boxed{
+        \Eacc{k}
+        = \Teff\,(2\tau)^{k-1}
+          \sum_{\substack{S\,\subseteq\,\{1,\ldots,8\}\\ |S|=k}}
+          \prod_{i\in S} r_i.
+    }
+    \tag{6.3}
+    \label{eq:Ek-total}
+\end{equation}
+
+\begin{result}[Total $k$-fold accidental rate, Eq.\ (6.3)]
+Equation~\eqref{eq:Ek-total} is exact within the Poisson framework and
+the rare-event approximation.  It is implemented numerically in
+\texttt{expected\_accidentals()} using the elementary symmetric
+polynomial $e_k(r_1,\ldots,r_8)$ to enumerate all $\binom{8}{k}$ subsets
+efficiently.
+\end{result}
+
+\subsection{Connection to elementary symmetric polynomials}
+
+The sum $\displaystyle\sum_{|S|=k}\prod_{i\in S} r_i$ is precisely the
+$k$-th \emph{elementary symmetric polynomial} in the rates:
+\[
+    e_k(r_1,\ldots,r_N) = \sum_{1\le i_1 < i_2 < \cdots < i_k \le N}
+        r_{i_1} r_{i_2} \cdots r_{i_k}.
+\]
+For instance,
+\[
+    e_2(r_1,\ldots,r_8) = \sum_{i<j} r_i r_j, \qquad
+    e_3(r_1,\ldots,r_8) = \sum_{i<j<\ell} r_i r_j r_\ell, \quad\ldots
+\]
+so that $\Eacc{k} = \Teff(2\tau)^{k-1}\,e_k(r_1,\ldots,r_8)$.
+
+\subsection{Scaling with fold order}
+
+A key insight is how $\Eacc{k}$ falls as $k$ increases.  For
+simplicity suppose all rates are equal: $r_i = r$.  Then
+$e_k(r,\ldots,r) = \binom{8}{k}r^k$, so
+\[
+    \Eacc{k} = \Teff\,(2\tau)^{k-1}\,\binom{8}{k}\,r^k
+    = \Teff\,r\,\binom{8}{k}\,(r\cdot 2\tau)^{k-1}.
+\]
+The ratio of consecutive fold orders is
+\begin{equation}
+    \frac{\Eacc{k+1}}{\Eacc{k}}
+    = \frac{\binom{8}{k+1}}{\binom{8}{k}}\cdot r\cdot 2\tau
+    = \frac{8-k}{k+1}\cdot r\cdot 2\tau.
+    \label{eq:fold-ratio}
+\end{equation}
+At $r = 1$~Hz and $2\tau = 1$~ms, the factor $r\cdot 2\tau = 10^{-3}$,
+so each additional fold suppresses $\Eacc{k}$ by roughly three orders of
+magnitude (multiplied by a combinatorial factor of order unity).  This
+is why a single observed 5-fold event, when $\Eacc{5} \sim 10^{-3}$ at
+the 1~ms window, constitutes an enormous statistical excess.
+
+% ───────────────────────────────────────────────────────────────────────────────
+\section{Numerical Results for the February 27 Dataset}
+\label{sec:numerical}
+% ───────────────────────────────────────────────────────────────────────────────
+
+The following table reproduces the expected accidentals from the
+Technical Report (\S6.3) for the February 27, 2026 run
+($\Teff \approx 3{,}576$~s, rates $r_i \in [0.81, 1.25]$~Hz):
+
+\begin{table}[h!]
+\centering
+\caption{Expected accidental coincidence counts $\Eacc{k}$ from
+Eq.~\eqref{eq:Ek-total} for selected coincidence windows and fold orders.
+Values are rounded to two significant figures.}
+\label{tab:accidentals}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{>{\centering\arraybackslash}p{1.5cm}
+                >{\centering\arraybackslash}p{1.8cm}
+                >{\centering\arraybackslash}p{1.8cm}
+                >{\centering\arraybackslash}p{1.8cm}
+                >{\centering\arraybackslash}p{1.8cm}
+                >{\centering\arraybackslash}p{1.8cm}}
+\toprule
+$2\tau$ & $E_2$ & $E_3$ & $E_4$ & $E_5$ & $E_6$ \\
+\midrule
+1~ms  & 202    & 0.80   & $<10^{-2}$  & $<10^{-3}$  & $<10^{-4}$ \\
+2~ms  & 405    & 3.2    & $<10^{-2}$  & $<10^{-3}$  & $<10^{-4}$ \\
+5~ms  & 1\,012  & 20.3   & 0.3         & $<10^{-2}$  & $<10^{-3}$ \\
+10~ms & 2\,024  & 81.1   & 2.0         & 0.02        & $<10^{-3}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+To illustrate the scaling law \eqref{eq:fold-ratio} concretely, at
+$2\tau = 1$~ms:
+\[
+    \frac{\Eacc{3}}{\Eacc{2}}
+    \approx \frac{0.80}{202} \approx 4\times 10^{-3}
+    \approx \frac{7}{2}\cdot r_{\text{avg}}\cdot 2\tau
+    = \frac{7}{2}\cdot 1\,\text{Hz}\cdot 10^{-3}\,\text{s},
+\]
+consistent with \eqref{eq:fold-ratio} at $k=2$.
+
+% ───────────────────────────────────────────────────────────────────────────────
+\section{Validity Conditions}
+\label{sec:validity}
+% ───────────────────────────────────────────────────────────────────────────────
+
+The derivation above rests on three conditions that must hold in practice.
+
+\paragraph{1.~Poisson statistics (stationarity and independence within a detector).}
+Each detector must fire at a constant mean rate with no clustering or
+periodicity in its own pulse stream.  The synchronisation veto removes
+hardware-generated periodic artefacts, making the post-veto event stream
+consistent with Poisson statistics.  Stationarity is verified by checking
+that the measured rate $r_i$ is stable across short sub-runs.
+
+\paragraph{2.~Rare-event / thin-window approximation.}
+Equation \eqref{eq:rare} must hold: $r_i \cdot 2\tau \ll 1$.  For the
+rates and windows in Table~\ref{tab:accidentals}:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{ccc}
+\toprule
+$2\tau$ & $r_{\max}\cdot 2\tau$ & Fractional error in $\Eacc{k}$ \\
+\midrule
+1~ms  & $1.25\times10^{-3}$ & $\sim 0.1\,\%$ \\
+10~ms & $1.25\times10^{-2}$ & $\sim 1\,\%$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+At all windows used, the approximation error is well within the
+statistical uncertainty of the measurements.
+
+\paragraph{3.~Independence between detectors.}
+Equation~\eqref{eq:all-followers} multiplies probabilities for different
+detectors using the product rule, which requires independence
+(Assumption~\ref{ass:indep}).  Physically this holds if the detectors do
+not share a noise source and if cosmic-ray showers — which would create
+correlated hits — are rare.  The entire point of the accidental
+calculation is to define a baseline against which genuine shower
+correlations are detected as a statistically significant excess.
+
+% ───────────────────────────────────────────────────────────────────────────────
+\section{Summary of Results}
+\label{sec:summary}
+% ───────────────────────────────────────────────────────────────────────────────
+
+\begin{result}[Two-fold accidentals between a specific pair $(i,j)$]
+\[
+    \Eacc{2,ij} = r_i\,r_j\,(2\tau)\,\Teff. \tag{6.1}
+\]
+\end{result}
+
+\begin{result}[$k$-fold accidentals for a specific $k$-tuple $S$]
+\[
+    \Eacc{k,S} = \Teff\,(2\tau)^{k-1}\prod_{i\in S} r_i. \tag{6.2}
+\]
+\end{result}
+
+\begin{result}[Total $k$-fold accidentals summed over all subsets]
+\[
+    \Eacc{k}
+    = \Teff\,(2\tau)^{k-1}
+      \sum_{\substack{S\,\subseteq\,\{1,\ldots,8\}\\ |S|=k}}
+      \prod_{i\in S} r_i
+    = \Teff\,(2\tau)^{k-1}\,e_k(r_1,\ldots,r_8).
+    \tag{6.3}
+\]
+The steep suppression with $k$ — approximately a factor of $r\cdot 2\tau
+\approx 10^{-3}$ per additional fold at 1~ms windows — means that even a
+single observed high-fold coincidence event constitutes an overwhelming
+statistical excess above this accidental background.
+\end{result}
+
+\end{document}
