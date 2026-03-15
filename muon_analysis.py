@@ -1,9 +1,10 @@
 """
 Muon Shower Coincidence Analysis
 Muhlenberg College 8-detector plastic scintillator array
-Data: data_acquisition_2-27.csv (February 27, 2026 run)
+Data: February 27, 2026 run
 """
 
+import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -13,7 +14,12 @@ from itertools import combinations
 import warnings
 warnings.filterwarnings("ignore")
 
-DATA_FILE   = "data_acquisition_2-27.csv"
+# To analyze a new run: update DATA_FILE to point to the new CSV.
+# PLOT_DIR is derived automatically — plots will follow the data.
+DATA_FILE   = "runs/feb27_GOOD/data_acquisition_2-27.csv"
+PLOT_DIR    = os.path.join(os.path.dirname(DATA_FILE), "plots")
+os.makedirs(PLOT_DIR, exist_ok=True)
+
 N_NANOS     = 8
 VETO_US     = 20_000          # ±20 ms sync veto window
 DROP_FIRST  = 2               # anomalous startup ST entries to drop per Nano
@@ -312,7 +318,7 @@ def plot_detector_rates(kept_events, t_eff_per_nano, rates):
     ax.legend(fontsize=7, ncol=2)
 
     plt.tight_layout()
-    plt.savefig("plot_01_detector_rates.png", dpi=150)
+    plt.savefig(os.path.join(PLOT_DIR, "plot_01_detector_rates.png"), dpi=150)
     plt.close()
     print("Saved plot_01_detector_rates.png")
 
@@ -347,7 +353,7 @@ def plot_clock_offsets(sync_array, offset_table):
 
     plt.suptitle("Pairwise Clock Offsets (Nano_i − Nano_1)", fontsize=13)
     plt.tight_layout()
-    plt.savefig("plot_02_clock_offsets.png", dpi=150)
+    plt.savefig(os.path.join(PLOT_DIR, "plot_02_clock_offsets.png"), dpi=150)
     plt.close()
     print("Saved plot_02_clock_offsets.png")
 
@@ -370,7 +376,7 @@ def plot_calibration_residuals(sync_array, offset_table):
     ax.legend(fontsize=8, ncol=2)
 
     plt.tight_layout()
-    plt.savefig("plot_03_calibration_residuals.png", dpi=150)
+    plt.savefig(os.path.join(PLOT_DIR, "plot_03_calibration_residuals.png"), dpi=150)
     plt.close()
     print("Saved plot_03_calibration_residuals.png")
 
@@ -432,7 +438,7 @@ def plot_obs_vs_exp(results_by_window, windows_ms):
     ax.legend(fontsize=8)
 
     plt.tight_layout()
-    plt.savefig("plot_04_obs_vs_exp_and_significance.png", dpi=150)
+    plt.savefig(os.path.join(PLOT_DIR, "plot_04_obs_vs_exp_and_significance.png"), dpi=150)
     plt.close()
     print("Saved plot_04_obs_vs_exp_and_significance.png")
 
@@ -466,7 +472,7 @@ def plot_coincidence_timeline(clusters_by_window, window_ms=1):
     ax.set_title(f"Coincidence Timeline ({window_ms} ms window)")
 
     plt.tight_layout()
-    plt.savefig("plot_05_coincidence_timeline.png", dpi=150)
+    plt.savefig(os.path.join(PLOT_DIR, "plot_05_coincidence_timeline.png"), dpi=150)
     plt.close()
     print("Saved plot_05_coincidence_timeline.png")
 
@@ -515,7 +521,7 @@ def plot_shower_candidate(clusters_by_window, window_ms=1, top_n=3):
     plt.suptitle(f"Top {top_n} High-Multiplicity Events ({window_ms} ms window)",
                  fontsize=12)
     plt.tight_layout()
-    plt.savefig("plot_06_shower_candidates.png", dpi=150)
+    plt.savefig(os.path.join(PLOT_DIR, "plot_06_shower_candidates.png"), dpi=150)
     plt.close()
     print("Saved plot_06_shower_candidates.png")
 
@@ -563,7 +569,7 @@ def plot_diag_A_sync_intervals(sync_array):
     ax.legend(fontsize=7, ncol=4)
 
     plt.tight_layout()
-    plt.savefig("diag_A_sync_intervals.png", dpi=150)
+    plt.savefig(os.path.join(PLOT_DIR, "diag_A_sync_intervals.png"), dpi=150)
     plt.close()
     rms_all = np.sqrt(np.mean(all_devs**2))
     print(f"Saved diag_A_sync_intervals.png  (RMS deviation = {rms_all:.2f} ms)")
@@ -614,7 +620,7 @@ def plot_diag_B_sync_jitter(sync_array, offset_table):
     ax.legend(fontsize=7, ncol=2)
 
     plt.tight_layout()
-    plt.savefig("diag_B_sync_jitter.png", dpi=150)
+    plt.savefig(os.path.join(PLOT_DIR, "diag_B_sync_jitter.png"), dpi=150)
     plt.close()
     print(f"Saved diag_B_sync_jitter.png  (RMS jitter = {rms_all:.2f} ms)")
 
@@ -687,7 +693,7 @@ def plot_diag_C_oos_residuals(sync_array, offset_table):
     ax.legend(fontsize=7, ncol=2)
 
     plt.tight_layout()
-    plt.savefig("diag_C_oos_residuals.png", dpi=150)
+    plt.savefig(os.path.join(PLOT_DIR, "diag_C_oos_residuals.png"), dpi=150)
     plt.close()
     print(f"Saved diag_C_oos_residuals.png  (overall OOS RMS = {overall_rms:.2f} ms)")
 
@@ -732,7 +738,7 @@ def plot_diag_D_max_interp_error(sync_array, offset_table):
     ax.legend(fontsize=7, ncol=2)
 
     plt.tight_layout()
-    plt.savefig("diag_D_max_interp_error.png", dpi=150)
+    plt.savefig(os.path.join(PLOT_DIR, "diag_D_max_interp_error.png"), dpi=150)
     plt.close()
     print(f"Saved diag_D_max_interp_error.png  "
           f"(median={med:.2f} ms, 95th pct={p95:.2f} ms)")
@@ -802,7 +808,7 @@ def plot_diag_E_dt_distribution(kept_events, window_us=1000):
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig("diag_E_dt_distribution.png", dpi=150)
+    plt.savefig(os.path.join(PLOT_DIR, "diag_E_dt_distribution.png"), dpi=150)
     plt.close()
     print(f"Saved diag_E_dt_distribution.png  (total pairs = {len(dt_values)})")
 
@@ -888,7 +894,7 @@ def plot_diag_F_null_test(kept_events, rates, T_eff_s, window_us=1000,
         fontsize=12
     )
     plt.tight_layout()
-    plt.savefig("diag_F_null_test.png", dpi=150)
+    plt.savefig(os.path.join(PLOT_DIR, "diag_F_null_test.png"), dpi=150)
     plt.close()
     print("Saved diag_F_null_test.png")
 

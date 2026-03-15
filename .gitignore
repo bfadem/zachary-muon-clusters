@@ -1,3 +1,25 @@
+# Data files — large, stored locally in runs/ folders
+*.csv
+
+# Generated plot outputs — reproducible from data
+*.png
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS
 .DS_Store
+.AppleDouble
+
+# Microsoft Office lock files (temporary files created when a doc is open)
 ~$*
+
+# Conda/virtual environment folders if ever created here
+env/
+venv/
+*.egg-info/
+
+# Claude Code local settings
 .claude/
