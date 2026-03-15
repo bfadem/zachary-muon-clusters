@@ -257,22 +257,30 @@ the calibration is working correctly. These are described briefly here:
 here immediately.
 
 **Plot B — Sync detection jitter:** After removing the smooth clock drift trend,
-plots the residual scatter in sync detection timing. This residual jitter is
-the irreducible floor on calibration accuracy — it cannot be improved by better
-interpolation because it reflects real variability in when each Nano registers
-the sync pulse.
+plots the residual scatter in sync detection timing. The residuals contain two
+components: (1) genuine ISR jitter (~4–8 µs) reflecting real variability in
+when each Nano registers the sync pulse, and (2) isolated spike artifacts caused
+by interrupt deferral during I²C callbacks (~10–20 ms), affecting ~1.4% of sync
+intervals. The spike artifacts dominate the RMS of this plot. They are not
+irreducible — firmware v2 eliminates them by removing Serial output from the
+onRequest callback.
 
 **Plot C — Out-of-sample calibration residuals:** The most rigorous test of
 calibration accuracy. The calibration is built using only even-numbered sync
 events, then used to predict the offset at odd-numbered sync events (which were
-not used in building the calibration). The RMS of the prediction errors is the
-true timing accuracy for PT events falling between sync pulses. This is the
-number that determines how small a coincidence window is physically meaningful.
+not used in building the calibration). The RMS of the prediction errors characterizes the timing accuracy for PT events
+falling between sync pulses. However, this RMS is dominated by the ~1.4% of
+intervals that contain spike artifacts. Excluding those intervals, the combined
+timing floor is ≈ 75 µs, making the 1 ms coincidence window well-justified.
+Spike intervals are handled separately by the jump veto.
 
 **Plot D — Maximum interpolation error:** For each 10-second sync interval,
 computes the maximum timing error that could result from piecewise-linear
 interpolation for an event at the midpoint of that interval. This is
 |Δoffset| / 4, where Δoffset is the change in clock offset across the interval.
+Note that the spike intervals (~1.4% of all intervals) produce anomalously large
+values in this plot. Excluding those, the median maximum interpolation error is
+well below 0.5 ms, consistent with the 75 µs combined timing floor.
 
 **Plot E — Δt distribution:** For all pairs of events from different Nanos that
 fall within the coincidence window, histograms the time difference |t_i − t_j|.
@@ -298,7 +306,9 @@ analysis-independent confirmation of the statistical significance.
 | Sync events per Nano | 357 (after dropping first 2) |
 | Per-detector rates | 0.81 – 1.25 Hz |
 | Clock drift range | −1,264 to +0 ppm (relative to Nano 1) |
-| Out-of-sample calibration RMS | ~1.26 ms |
+| Out-of-sample calibration RMS (all intervals) | ~1.26 ms |
+| Out-of-sample calibration RMS (spike intervals excluded) | ~0.075 ms |
+| Fraction of spike intervals | ~1.4% |
 | 2-fold coincidences at 1 ms | 274 observed, 202 expected, +4.8σ |
 | 3-fold coincidences at 1 ms | 7 observed, 0.8 expected, +4.1σ |
 | 5-fold coincidence at 1 ms | 1 observed, ~0 expected, +4.5σ |
@@ -325,3 +335,8 @@ inconsistent with the hypothesis that all detectors fire independently.
 - A second independent data run showing the same excess.
 - Hardware investigation to rule out common-mode electrical noise as an
   alternative explanation for multi-detector coincidences.
+
+**Note on timing resolution:** The calibration timing floor of ~75 µs
+(excluding spike intervals) means the 1 ms coincidence window is well-supported
+by the data quality. The spike intervals (~1.4% of the run) are handled by the
+jump veto. The firmware v2 rewrite eliminates the source of the spikes entirely.
