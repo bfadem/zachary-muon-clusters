@@ -181,6 +181,16 @@ Key rules:
 - Each PT event can belong to at most one cluster (greedy, earliest-first).
 - Only one hit per Nano per cluster (the earliest available one within the window).
 
+**Why the algorithm and formula are consistent:** Because the seed is always
+the *earliest* unused event, any pair (A, B) with A before B and |A−B| < W
+is captured when A is the seed. Every such pair is found exactly once.
+The accidental formula (Step 7) uses **2τ** (with τ = W) rather than just W.
+This factor of 2 arises because both temporal orderings contribute to the
+expected count: detector i firing before j, and j firing before i, each
+contribute r_i × r_j × W × T independently. The total expected count for
+the pair is 2 × r_i × r_j × W × T, which equals r_i × r_j × (2τ) × T with
+τ = W. This matches what the greedy algorithm counts.
+
 The window width W is a free parameter. We test W = 1, 2, 5, 10, 20, 50 ms.
 
 The **multiplicity** (or fold) of a cluster is the number of distinct Nanos
